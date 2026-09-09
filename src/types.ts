@@ -20,3 +20,4 @@ export interface CartData {
   currency_code: string;
   total_items_count: number;
 }
+

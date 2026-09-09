@@ -270,3 +270,4 @@ export const CartFragment: React.FC<CartFragmentProps> = ({
     </div>
   );
 };
+
