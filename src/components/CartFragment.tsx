@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
   Trash2,
-  Plus,
-  Minus,
   ArrowRight,
   ShieldCheck,
   CheckCircle2,
@@ -15,7 +13,13 @@ import {
   ProtonButton,
   ProtonStatusBadge,
   ProtonCard,
+  ProtonSpinner,
 } from '@dipesh.singh/proton/react';
+import {
+  QuantityStepper,
+  PriceDisplay,
+  EmptyState,
+} from '@dipesh.singh/commerce-ui';
 import { fetchCart, removeLineItem, updateLineItemQuantity } from '../api';
 import { CartData } from '../types';
 
@@ -73,10 +77,8 @@ export const CartFragment: React.FC<CartFragmentProps> = ({
 
   const handleRemove = async (lineItemId: string) => {
     if (!cart) return;
-    const updated = await removeLineItem(cart.id, lineItemId);
-    if (updated) {
-      setCart(updated);
-    } else {
+    const ok = await removeLineItem(cart.id, lineItemId);
+    if (ok) {
       const items = cart.line_items.filter((li) => li.id !== lineItemId);
       setCart({
         ...cart,
@@ -89,8 +91,9 @@ export const CartFragment: React.FC<CartFragmentProps> = ({
 
   if (isLoading || !cart) {
     return (
-      <div className="min-h-[400px] flex items-center justify-center">
-        <div className="w-8 h-8 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-[400px] flex flex-col items-center justify-center space-y-2">
+        <ProtonSpinner size="lg" variant="coffee" label="Loading cart..." />
+        <p className="text-xs text-slate-500 font-medium">Loading cart...</p>
       </div>
     );
   }
@@ -101,14 +104,15 @@ export const CartFragment: React.FC<CartFragmentProps> = ({
 
   if (cart.line_items.length === 0) {
     return (
-      <div className="py-16 text-center space-y-4 max-w-md mx-auto">
-        <div className="w-16 h-16 rounded-3xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-4">
-          <ShoppingBag className="w-8 h-8" />
-        </div>
-        <h2 className="text-xl font-bold text-slate-800">Your Cart is Empty</h2>
-        <p className="text-xs text-slate-500">
-          Your commercetools cart session is ready. Add appliances to check kitchen fitment.
-        </p>
+      <div className="py-16 max-w-md mx-auto">
+        <EmptyState
+          title="Your Barista Bag is Empty"
+          description="Your commercetools cart session is ready. Add appliances to check kitchen fitment."
+          actionLabel="Explore Coffee & Gear"
+          onAction={() => {
+            window.location.hash = '#/';
+          }}
+        />
       </div>
     );
   }
@@ -152,37 +156,25 @@ export const CartFragment: React.FC<CartFragmentProps> = ({
                             {item.dimensions_summary}
                           </p>
                         )}
-                        <span className="text-xs font-black text-slate-800 mt-1 block">
-                          ${(item.price_cents / 100).toFixed(2)} each
-                        </span>
+                        <div className="mt-1">
+                          <PriceDisplay cents={item.price_cents} size="sm" />
+                        </div>
                       </div>
                     </div>
 
-                    {/* Quantity Controls */}
+                    {/* Quantity Controls via QuantityStepper */}
                     <div className="flex items-center justify-between sm:justify-end gap-4 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100">
-                      <div className="flex items-center gap-2 bg-slate-100 p-1 rounded-xl">
-                        <button
-                          type="button"
-                          onClick={() => handleUpdateQty(item.id, item.quantity - 1)}
-                          className="p-1 rounded-lg text-slate-600 hover:bg-white hover:text-slate-900 transition-colors"
-                        >
-                          <Minus className="w-3.5 h-3.5" />
-                        </button>
-                        <span className="w-6 text-center text-xs font-bold text-slate-800">
-                          {item.quantity}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => handleUpdateQty(item.id, item.quantity + 1)}
-                          className="p-1 rounded-lg text-slate-600 hover:bg-white hover:text-slate-900 transition-colors"
-                        >
-                          <Plus className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
+                      <QuantityStepper
+                        size="sm"
+                        value={item.quantity}
+                        min={1}
+                        max={99}
+                        onChange={(newQty) => handleUpdateQty(item.id, newQty)}
+                      />
 
-                      <span className="text-sm font-black text-slate-900 w-20 text-right">
-                        ${(item.total_price_cents / 100).toFixed(2)}
-                      </span>
+                      <div className="w-24 text-right">
+                        <PriceDisplay cents={item.total_price_cents} size="md" />
+                      </div>
 
                       <button
                         type="button"
@@ -244,21 +236,21 @@ export const CartFragment: React.FC<CartFragmentProps> = ({
               <h3 className="text-base font-bold text-slate-900">Order Summary</h3>
 
               <div className="space-y-2.5 text-xs text-slate-600 mt-4">
-                <div className="flex justify-between">
+                <div className="flex justify-between items-center">
                   <span>Items Subtotal</span>
-                  <span className="font-semibold text-slate-800">${subtotal.toFixed(2)}</span>
+                  <PriceDisplay cents={cart.total_price_cents} size="sm" />
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between items-center">
                   <span>White-Glove Delivery</span>
                   <span className="text-emerald-600 font-bold">FREE</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between items-center">
                   <span>Estimated Sales Tax</span>
-                  <span className="font-semibold text-slate-800">${estimatedTax.toFixed(2)}</span>
+                  <PriceDisplay cents={Math.round(estimatedTax * 100)} size="sm" />
                 </div>
                 <div className="pt-3 border-t border-slate-100 flex justify-between items-baseline">
                   <span className="text-sm font-bold text-slate-900">Total</span>
-                  <span className="text-2xl font-black text-slate-900">${grandTotal.toFixed(2)}</span>
+                  <PriceDisplay cents={Math.round(grandTotal * 100)} size="lg" />
                 </div>
               </div>
 
