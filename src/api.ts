@@ -16,7 +16,7 @@ export async function fetchCart(cartId?: string): Promise<CartData> {
   }
 
   return {
-    id: cartId || 'cart_demo_sample',
+    id: cartId || 'cart_demo_session',
     version: 1,
     line_items: [
       {
@@ -34,19 +34,19 @@ export async function fetchCart(cartId?: string): Promise<CartData> {
       },
       {
         id: 'li_sample_2',
-        product_id: 'prod_vitamix_5200',
-        name: '5200 Professional Blender',
+        product_id: 'prod_hiljhil_guji',
+        name: 'Ethiopian Guji Single Origin (250g)',
         quantity: 1,
-        price_cents: 49995,
-        total_price_cents: 49995,
+        price_cents: 2200,
+        total_price_cents: 2200,
         currency_code: 'USD',
-        brand: 'Vitamix',
-        image_url: 'https://images.unsplash.com/photo-1570222094114-d054a817e56b?w=600&auto=format&fit=crop&q=80',
-        dimensions_summary: '22.2 × 52.0 × 18.5 cm',
-        fitment_verified: false,
+        brand: 'Hiljhil Roasters',
+        image_url: 'https://images.unsplash.com/photo-1587734195503-904fca47e0e9?w=600&auto=format&fit=crop&q=80',
+        dimensions_summary: 'Whole Bean Roast',
+        fitment_verified: true,
       },
     ],
-    total_price_cents: 149990,
+    total_price_cents: 102195,
     currency_code: 'USD',
     total_items_count: 2,
   };
