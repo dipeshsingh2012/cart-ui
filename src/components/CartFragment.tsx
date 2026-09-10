@@ -15,7 +15,7 @@ import {
   ProtonButton,
   ProtonStatusBadge,
   ProtonCard,
-} from '@dipeshsingh2012/proton/react';
+} from '@dipesh.singh/proton/react';
 import { fetchCart, removeLineItem, updateLineItemQuantity } from '../api';
 import { CartData } from '../types';
 
