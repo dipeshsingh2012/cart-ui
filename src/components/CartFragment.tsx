@@ -10,6 +10,12 @@ import {
   ShoppingBag,
   Truck,
 } from 'lucide-react';
+import {
+  ProtonThemeProvider,
+  ProtonButton,
+  ProtonStatusBadge,
+  ProtonCard,
+} from 'proton/react';
 import { fetchCart, removeLineItem, updateLineItemQuantity } from '../api';
 import { CartData } from '../types';
 
@@ -108,166 +114,180 @@ export const CartFragment: React.FC<CartFragmentProps> = ({
   }
 
   return (
-    <div className="py-6 space-y-8 max-w-6xl mx-auto">
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Left Column: Cart Items */}
-        <div className="lg:col-span-8 space-y-4">
-          {cart.line_items.map((item) => (
-            <div
-              key={item.id}
-              className="bg-white rounded-3xl border border-slate-200 p-5 shadow-xs space-y-4"
-            >
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div className="flex items-center gap-4">
-                  <div className="w-20 h-20 rounded-2xl bg-slate-50 p-2 flex items-center justify-center shrink-0 border border-slate-100">
-                    {item.image_url ? (
-                      <img
-                        src={item.image_url}
-                        alt={item.name}
-                        className="max-h-full max-w-full object-contain"
-                      />
-                    ) : (
-                      <ShoppingBag className="w-6 h-6 text-slate-300" />
-                    )}
-                  </div>
-
-                  <div>
-                    {item.brand && (
-                      <span className="text-[10px] font-bold text-indigo-600 uppercase tracking-wider">
-                        {item.brand}
-                      </span>
-                    )}
-                    <h3 className="text-sm font-bold text-slate-900 line-clamp-1">{item.name}</h3>
-                    {item.dimensions_summary && (
-                      <p className="text-xs font-mono text-slate-500 mt-0.5">
-                        {item.dimensions_summary}
-                      </p>
-                    )}
-                    <span className="text-xs font-black text-slate-800 mt-1 block">
-                      ${(item.price_cents / 100).toFixed(2)} each
-                    </span>
-                  </div>
-                </div>
-
-                {/* Quantity Controls */}
-                <div className="flex items-center justify-between sm:justify-end gap-4 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100">
-                  <div className="flex items-center gap-2 bg-slate-100 p-1 rounded-xl">
-                    <button
-                      type="button"
-                      onClick={() => handleUpdateQty(item.id, item.quantity - 1)}
-                      className="p-1 rounded-lg text-slate-600 hover:bg-white hover:text-slate-900 transition-colors"
-                    >
-                      <Minus className="w-3.5 h-3.5" />
-                    </button>
-                    <span className="w-6 text-center text-xs font-bold text-slate-800">
-                      {item.quantity}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => handleUpdateQty(item.id, item.quantity + 1)}
-                      className="p-1 rounded-lg text-slate-600 hover:bg-white hover:text-slate-900 transition-colors"
-                    >
-                      <Plus className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-
-                  <span className="text-sm font-black text-slate-900 w-20 text-right">
-                    ${(item.total_price_cents / 100).toFixed(2)}
-                  </span>
-
-                  <button
-                    type="button"
-                    onClick={() => handleRemove(item.id)}
-                    className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors"
-                    title="Remove Item"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-
-              {/* Kitchen Fitment Readiness Alert */}
-              <div
-                className={`p-3 rounded-2xl text-xs flex items-center justify-between gap-3 ${
-                  item.fitment_verified
-                    ? 'bg-emerald-50/80 border border-emerald-200 text-emerald-800'
-                    : 'bg-amber-50/80 border border-amber-200 text-amber-800'
-                }`}
+    <ProtonThemeProvider>
+      <div className="py-6 space-y-8 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          {/* Left Column: Cart Items */}
+          <div className="lg:col-span-8 space-y-4">
+            {cart.line_items.map((item) => (
+              <ProtonCard
+                key={item.id}
+                hoverEffect
+                padding="md"
               >
-                <div className="flex items-center gap-2">
-                  {item.fitment_verified ? (
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                  ) : (
-                    <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
-                  )}
-                  <span>
-                    {item.fitment_verified
-                      ? 'Countertop Fitment Verified: Cleared for your kitchen clearance.'
-                      : 'Countertop clearance not yet confirmed for your cabinets.'}
-                  </span>
-                </div>
+                <div className="space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                      <div className="w-20 h-20 rounded-2xl bg-slate-50 p-2 flex items-center justify-center shrink-0 border border-slate-100">
+                        {item.image_url ? (
+                          <img
+                            src={item.image_url}
+                            alt={item.name}
+                            className="max-h-full max-w-full object-contain"
+                          />
+                        ) : (
+                          <ShoppingBag className="w-6 h-6 text-slate-300" />
+                        )}
+                      </div>
 
-                {!item.fitment_verified && onVerifyFitmentClick && (
-                  <button
-                    type="button"
-                    onClick={() => onVerifyFitmentClick(item.product_id)}
-                    className="px-2.5 py-1 rounded-lg bg-amber-200/60 hover:bg-amber-200 text-amber-900 text-[11px] font-bold whitespace-nowrap transition-colors"
+                      <div>
+                        {item.brand && (
+                          <span className="text-[10px] font-bold text-amber-700 uppercase tracking-wider">
+                            {item.brand}
+                          </span>
+                        )}
+                        <h3 className="text-sm font-bold text-slate-900 line-clamp-1">{item.name}</h3>
+                        {item.dimensions_summary && (
+                          <p className="text-xs font-mono text-slate-500 mt-0.5">
+                            {item.dimensions_summary}
+                          </p>
+                        )}
+                        <span className="text-xs font-black text-slate-800 mt-1 block">
+                          ${(item.price_cents / 100).toFixed(2)} each
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Quantity Controls */}
+                    <div className="flex items-center justify-between sm:justify-end gap-4 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100">
+                      <div className="flex items-center gap-2 bg-slate-100 p-1 rounded-xl">
+                        <button
+                          type="button"
+                          onClick={() => handleUpdateQty(item.id, item.quantity - 1)}
+                          className="p-1 rounded-lg text-slate-600 hover:bg-white hover:text-slate-900 transition-colors"
+                        >
+                          <Minus className="w-3.5 h-3.5" />
+                        </button>
+                        <span className="w-6 text-center text-xs font-bold text-slate-800">
+                          {item.quantity}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => handleUpdateQty(item.id, item.quantity + 1)}
+                          className="p-1 rounded-lg text-slate-600 hover:bg-white hover:text-slate-900 transition-colors"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+
+                      <span className="text-sm font-black text-slate-900 w-20 text-right">
+                        ${(item.total_price_cents / 100).toFixed(2)}
+                      </span>
+
+                      <button
+                        type="button"
+                        onClick={() => handleRemove(item.id)}
+                        className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors"
+                        title="Remove Item"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Kitchen Fitment Readiness Alert via ProtonStatusBadge */}
+                  <div
+                    className={`p-3 rounded-2xl text-xs flex items-center justify-between gap-3 ${
+                      item.fitment_verified
+                        ? 'bg-emerald-50/80 border border-emerald-200 text-emerald-800'
+                        : 'bg-amber-50/80 border border-amber-200 text-amber-800'
+                    }`}
                   >
-                    Verify Fitment
-                  </button>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
+                    <div className="flex items-center gap-2">
+                      <ProtonStatusBadge
+                        status={item.fitment_verified ? 'success' : 'warning'}
+                        pulse={item.fitment_verified}
+                        icon={
+                          item.fitment_verified ? (
+                            <CheckCircle2 style={{ width: 12, height: 12 }} />
+                          ) : (
+                            <AlertTriangle style={{ width: 12, height: 12 }} />
+                          )
+                        }
+                        label={
+                          item.fitment_verified
+                            ? 'Countertop Fitment Verified: Cleared for your kitchen clearance.'
+                            : 'Countertop clearance not yet confirmed for your cabinets.'
+                        }
+                        size="sm"
+                      />
+                    </div>
 
-        {/* Right Column: Order Summary */}
-        <div className="lg:col-span-4 space-y-4">
-          <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm space-y-4">
-            <h3 className="text-base font-bold text-slate-900">Order Summary</h3>
+                    {!item.fitment_verified && onVerifyFitmentClick && (
+                      <ProtonButton
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => onVerifyFitmentClick(item.product_id)}
+                      >
+                        Verify Fitment
+                      </ProtonButton>
+                    )}
+                  </div>
+                </div>
+              </ProtonCard>
+            ))}
+          </div>
 
-            <div className="space-y-2.5 text-xs text-slate-600">
-              <div className="flex justify-between">
-                <span>Items Subtotal</span>
-                <span className="font-semibold text-slate-800">${subtotal.toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>White-Glove Delivery</span>
-                <span className="text-emerald-600 font-bold">FREE</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Estimated Sales Tax</span>
-                <span className="font-semibold text-slate-800">${estimatedTax.toFixed(2)}</span>
-              </div>
-              <div className="pt-3 border-t border-slate-100 flex justify-between items-baseline">
-                <span className="text-sm font-bold text-slate-900">Total</span>
-                <span className="text-2xl font-black text-slate-900">${grandTotal.toFixed(2)}</span>
-              </div>
-            </div>
+          {/* Right Column: Order Summary */}
+          <div className="lg:col-span-4 space-y-4">
+            <ProtonCard variant="outlined" padding="lg">
+              <h3 className="text-base font-bold text-slate-900">Order Summary</h3>
 
-            <button
-              type="button"
-              onClick={() => onProceedToCheckout?.(cart)}
-              className="w-full py-3.5 px-4 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-sm shadow-indigo-200 transition-colors"
-            >
-              <span>Proceed to Checkout</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
+              <div className="space-y-2.5 text-xs text-slate-600 mt-4">
+                <div className="flex justify-between">
+                  <span>Items Subtotal</span>
+                  <span className="font-semibold text-slate-800">${subtotal.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>White-Glove Delivery</span>
+                  <span className="text-emerald-600 font-bold">FREE</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Estimated Sales Tax</span>
+                  <span className="font-semibold text-slate-800">${estimatedTax.toFixed(2)}</span>
+                </div>
+                <div className="pt-3 border-t border-slate-100 flex justify-between items-baseline">
+                  <span className="text-sm font-bold text-slate-900">Total</span>
+                  <span className="text-2xl font-black text-slate-900">${grandTotal.toFixed(2)}</span>
+                </div>
+              </div>
 
-            <div className="pt-2 text-[11px] text-slate-500 space-y-1.5 border-t border-slate-100">
-              <div className="flex items-center gap-1.5">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Zero-Error Fitment Guarantee Protection</span>
+              <div className="mt-5">
+                <ProtonButton
+                  fullWidth
+                  size="lg"
+                  endIcon={<ArrowRight style={{ width: 16, height: 16 }} />}
+                  onClick={() => onProceedToCheckout?.(cart)}
+                >
+                  Proceed to Checkout
+                </ProtonButton>
               </div>
-              <div className="flex items-center gap-1.5">
-                <Truck className="w-3.5 h-3.5 text-indigo-600" />
-                <span>Free returns if verified appliance does not fit</span>
+
+              <div className="pt-4 text-[11px] text-slate-500 space-y-1.5 border-t border-slate-100 mt-4">
+                <div className="flex items-center gap-1.5">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Zero-Error Fitment Guarantee Protection</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Truck className="w-3.5 h-3.5 text-amber-700" />
+                  <span>Free returns if verified appliance does not fit</span>
+                </div>
               </div>
-            </div>
+            </ProtonCard>
           </div>
         </div>
       </div>
-    </div>
+    </ProtonThemeProvider>
   );
 };
 
