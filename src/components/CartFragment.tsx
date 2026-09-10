@@ -271,3 +271,4 @@ export const CartFragment: React.FC<CartFragmentProps> = ({
   );
 };
 
+export default CartFragment;
