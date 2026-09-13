@@ -4,7 +4,9 @@ import federation from '@originjs/vite-plugin-federation';
 import fs from 'node:fs';
 import path from 'node:path';
 
-export default defineConfig({
+export default defineConfig(({ mode }) => {
+  return {
+    base: process.env.VERCEL ? '/' : (process.env.VITE_BASE_URL || 'https://storage.googleapis.com/mycommerce/mfes/cart-ui/'),
   plugins: [
     react(),
     federation({
@@ -59,4 +61,5 @@ export default defineConfig({
       'Access-Control-Allow-Origin': '*',
     },
   },
+};
 });
