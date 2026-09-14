@@ -2,7 +2,7 @@ import { CartData } from './types';
 
 const CART_API_URL = import.meta.env.VITE_CART_API_URL || 'https://cart-service-fzdcrf2fxq-uc.a.run.app/api/v1/carts';
 
-const INITIAL_FALLBACK_CART: CartData = {
+export const INITIAL_FALLBACK_CART: CartData = {
   id: 'cart_demo_session',
   version: 1,
   line_items: [

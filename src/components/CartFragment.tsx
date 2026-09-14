@@ -20,30 +20,41 @@ import {
   PriceDisplay,
   EmptyState,
 } from '@dipesh.singh/commerce-ui';
-import { fetchCart, removeLineItem, updateLineItemQuantity } from '../api';
+import { fetchCart, removeLineItem, updateLineItemQuantity, INITIAL_FALLBACK_CART } from '../api';
 import { CartData } from '../types';
 
 interface CartFragmentProps {
   cartId?: string;
+  initialCart?: CartData | null;
   onVerifyFitmentClick?: (productId: string) => void;
   onProceedToCheckout?: (cart: CartData) => void;
 }
 
 export const CartFragment: React.FC<CartFragmentProps> = ({
   cartId,
+  initialCart,
   onVerifyFitmentClick,
   onProceedToCheckout,
 }) => {
-  const [cart, setCart] = useState<CartData | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [cart, setCart] = useState<CartData | null>(initialCart || INITIAL_FALLBACK_CART);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
+    let isMounted = true;
     async function load() {
+      setIsLoading(true);
       const data = await fetchCart(cartId);
-      setCart(data);
-      setIsLoading(false);
+      if (isMounted) {
+        if (data) {
+          setCart(data);
+        }
+        setIsLoading(false);
+      }
     }
     load();
+    return () => {
+      isMounted = false;
+    };
   }, [cartId]);
 
   const handleUpdateQty = async (lineItemId: string, newQty: number) => {
