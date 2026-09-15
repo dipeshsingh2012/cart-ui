@@ -121,7 +121,7 @@ export const CartFragment: React.FC<CartFragmentProps> = ({
           description="Your commercetools cart session is ready. Add appliances to check kitchen fitment."
           actionLabel="Explore Coffee & Gear"
           onAction={() => {
-            window.location.hash = '#/';
+            window.location.href = '/';
           }}
         />
       </div>

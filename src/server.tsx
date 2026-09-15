@@ -8,3 +8,4 @@ export function render(props: any = {}): string {
 
 export { CartFragment };
 export default CartFragment;
+
